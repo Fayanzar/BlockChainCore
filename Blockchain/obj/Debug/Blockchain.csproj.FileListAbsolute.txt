@@ -1,6 +1,0 @@
-c:\users\fayanzar\documents\visual studio 2015\Projects\Blockchain\Blockchain\bin\Debug\Blockchain.exe.config
-c:\users\fayanzar\documents\visual studio 2015\Projects\Blockchain\Blockchain\bin\Debug\Blockchain.exe
-c:\users\fayanzar\documents\visual studio 2015\Projects\Blockchain\Blockchain\bin\Debug\Blockchain.pdb
-c:\users\fayanzar\documents\visual studio 2015\Projects\Blockchain\Blockchain\obj\Debug\Blockchain.csprojResolveAssemblyReference.cache
-c:\users\fayanzar\documents\visual studio 2015\Projects\Blockchain\Blockchain\obj\Debug\Blockchain.exe
-c:\users\fayanzar\documents\visual studio 2015\Projects\Blockchain\Blockchain\obj\Debug\Blockchain.pdb
