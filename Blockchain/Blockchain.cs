@@ -26,45 +26,56 @@ namespace Blockchain
             var serializer = new JavaScriptSerializer();
             return serializer.Serialize(this);
         }
+
+        public static string Merkle(List<Transaction> trans)
+        {
+            var transactions = trans.Select(x => Crypto.Hash(x.ToString())).ToList();
+            while (transactions.Count > 1)
+            {
+                List<string> level = new List<string>();
+                int n = transactions.Count / 2;
+                for (int i = 0; i < n - 1; i++)
+                {
+                    level.Add(Crypto.Hash(Crypto.ToStrASCII(transactions[0]) + Crypto.ToStrASCII(transactions[1])));
+                    transactions.RemoveRange(0, 2);
+                }
+                if (transactions.Any())
+                {
+                    level.Add(Crypto.Hash(Crypto.ToStrASCII(transactions[0]) + Crypto.ToStrASCII(transactions[0])));
+                    transactions.RemoveAt(0);
+                }
+                transactions = level;
+            }
+            return transactions[0];
+        }
     }
     
     public struct Block
     {
         public int index;
         public string timestamp;
-        public List<Transaction> transactions;
+        public string merkleRoot;
         public string ownHash;
         public string prevHash;
         public Block(int i, string t, List<Transaction> tr, string pr)
         {
             index = i;
             timestamp = t;
-            transactions = tr.Select(x => x).ToList();
+            merkleRoot = Transaction.Merkle(tr);
             prevHash = pr;
             ownHash = "";
-        }
-        static string ToStr(byte[] bytes, bool upperCase)
-        {
-            StringBuilder result = new StringBuilder(bytes.Length * 2);
-
-            for (int i = 0; i < bytes.Length; i++)
-                result.Append(bytes[i].ToString(upperCase ? "X2" : "x2"));
-
-            return result.ToString();
         }
         public void ComputeHash()
         {
             ownHash = "";
-            var sha = new SHA512CryptoServiceProvider();
-            Encoding asc = Encoding.ASCII;
-            byte[] bl = asc.GetBytes(ToString());
-            ownHash = ToStr(sha.ComputeHash(bl), false);
+            ownHash = Crypto.Hash(ToString());
         }
         public override string ToString()
         {
             var serializer = new JavaScriptSerializer();
             return serializer.Serialize(this);
         }
+
     }
     public class Blockchain
     {
@@ -79,29 +90,15 @@ namespace Blockchain
         {
             transactions.Add(new Transaction(p, r, a, t));        
         }
-        static string ToStr(byte[] bytes, bool upperCase)
-        {
-            StringBuilder result = new StringBuilder(bytes.Length * 2);
-
-            for (int i = 0; i < bytes.Length; i++)
-                result.Append(bytes[i].ToString(upperCase ? "X2" : "x2"));
-
-            return result.ToString();
-        }
 
         public void MineBlock()
         {
             //have to send a message to the sender and recipient for the transaction has passed succesfully
-           /* string prevHash = chain.Count > 0 ? chain.ElementAt(chain.Count - 2) : "0";
+            string prevHash = chain.Count > 0 ? chain.ElementAt(chain.Count - 2) : "0";
             string timestamp = DateTime.Now.ToString();
             Block block = new Block(chain.Count, timestamp, transactions, prevHash);
-            var sha = new SHA512CryptoServiceProvider();
-            Encoding u8 = Encoding.ASCII;
-            byte[] bl = u8.GetBytes(block.ToString());
-            string hash = ToStr(sha.ComputeHash(bl), false);
-            Console.WriteLine(hash);
-            chain.Add(hash);
-            return block; */
+            block.ComputeHash();
+            chain.Add(block.ToString());
         }
     }
 }
