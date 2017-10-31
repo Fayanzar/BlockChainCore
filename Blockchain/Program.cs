@@ -10,9 +10,9 @@ namespace Blockchain
     {
         static void Main(string[] args)
         {
-            Blockchain BCh = new Blockchain();
-            BCh.AddTransaction("35", "342", 10);
-            Block b = BCh.MineBlock();
+           // Blockchain BCh = new Blockchain();
+            //BCh.AddTransaction("35", "342", 10);
+            //Block b = BCh.MineBlock();
             //Console.WriteLine(b.ToString());
             Console.ReadKey();
         }
