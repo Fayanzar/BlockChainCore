@@ -38,5 +38,20 @@ namespace Blockchain
             byte[] br = sha.ComputeHash(bl);
             return ToStrHex(br, false);
         }
+
+        public static string SignData(string data, RSAParameters Key)
+        {
+            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(Key);
+            Encoding asc = Encoding.ASCII;
+            byte[] bl = asc.GetBytes(data);
+            byte[] br = rsa.SignData(bl, new SHA512CryptoServiceProvider());
+            return ToStrHex(br, false);
+        }
+
+        public static bool VerifyData(string verData, string sigData, RSAParameters Key)
+        {
+
+        }
     }
 }
