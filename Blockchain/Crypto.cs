@@ -9,7 +9,7 @@ namespace Blockchain
 {
     static public class Crypto
     {
-        static string ToStrHex(byte[] bytes, bool upperCase)
+        public static string ToStrHex(byte[] bytes, bool upperCase)
         {
             StringBuilder result = new StringBuilder(bytes.Length * 2);
 
@@ -29,6 +29,15 @@ namespace Blockchain
                 Convert.ToChar(Convert.ToUInt32(hex.Substring(0, 2), 16)).ToString();
             }
             return sb.ToString();
+        }
+
+        public static byte[] HexToByteArray(string hex)
+        {
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
         }
         static public string Hash(string data)
         {
@@ -51,7 +60,12 @@ namespace Blockchain
 
         public static bool VerifyData(string verData, string sigData, RSAParameters Key)
         {
-
+            Encoding asc = Encoding.ASCII;
+            byte[] bv = HexToByteArray(verData);
+            byte[] bs = asc.GetBytes(sigData);
+            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(Key);
+            return rsa.VerifyData(bs, new SHA512CryptoServiceProvider(), bv);
         }
     }
 }
