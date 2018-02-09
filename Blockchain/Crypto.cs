@@ -79,7 +79,7 @@ namespace Blockchain
         }
         static public string Hash(string data)
         {
-            var sha = new SHA512CryptoServiceProvider();
+            var sha = new SHA256CryptoServiceProvider();
             Encoding asc = Encoding.ASCII;
             byte[] bl = asc.GetBytes(data);
             byte[] br = sha.ComputeHash(bl);

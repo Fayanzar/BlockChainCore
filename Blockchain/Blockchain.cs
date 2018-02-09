@@ -10,16 +10,29 @@ namespace Blockchain
     public enum TranType { one, two, three }
     public struct Transaction
     {
-        public string prevHash;
         public string recipient;
         public decimal amount;
         public TranType tranType;
-        public Transaction(string p, string r, decimal a, TranType t)
+        public string message;
+        public string v;
+        public string r;
+        public string s;
+        public Transaction(string re, decimal a, TranType t, string m, string v0, string r0, string s0)
         {
-            prevHash = p;
-            recipient = r;
+            recipient = re;
             amount = a;
             tranType = t;
+            message = m;
+            v = v0;
+            r = r0;
+            s = s0;
+        }
+        public Transaction Sign(string privKey, string pubKey)
+        {
+            Point G = ECDSAParameters.basePoint;
+            var k = NumFinite.BigRandom(ECDSAParameters.order);
+
+            return this;
         }
         public override string ToString()
         {
@@ -86,9 +99,9 @@ namespace Blockchain
             transactions = new List<Transaction>();
         }
 
-        public void AddTransaction(string p, string r, decimal a, TranType t)
+        public void AddTransaction(string re, decimal a, TranType t, string m, string v, string r, string s)
         {
-            transactions.Add(new Transaction(p, r, a, t));        
+            transactions.Add(new Transaction(re, a, t, m, v, r, s));        
         }
 
         public void MineBlock()

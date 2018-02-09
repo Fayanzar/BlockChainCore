@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Blockchain.cs" />
     <Compile Include="Crypto.cs" />
+    <Compile Include="NumFinite.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

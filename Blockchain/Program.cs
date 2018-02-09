@@ -8,6 +8,13 @@ using System.Numerics;
 
 namespace Blockchain
 {
+    public static class ECDSAParameters
+    {
+        public static BigInteger modulo;
+        public static BigInteger order;
+        public static Point basePoint;
+    }
+
     class Program
     {
        
