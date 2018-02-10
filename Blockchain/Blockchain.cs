@@ -8,7 +8,7 @@ namespace Blockchain
     public enum TranType { one, two, three }
     public struct Transaction
     {
-        public string recipient;
+        public string to;
         public decimal amount;
         public TranType tranType;
         public string message;
@@ -17,7 +17,7 @@ namespace Blockchain
         public string s;
         public Transaction(string re, decimal a, TranType t, string m)
         {
-            recipient = re;
+            to = re;
             amount = a;
             tranType = t;
             message = m;
@@ -43,7 +43,7 @@ namespace Blockchain
                 } while (rn.num == 0);
                 sn = (((NumOrder)z + (NumOrder)rn * privKey) / (NumOrder)k);
             } while (sn.num == 0);
-            Transaction tr = new Transaction(recipient, amount, tranType, message);
+            Transaction tr = new Transaction(to, amount, tranType, message);
             tr.r = rn.ToString();
             tr.s = sn.ToString();
 
@@ -55,9 +55,9 @@ namespace Blockchain
             return tr;
         }
 
-        public bool Verify(string privKey)
+        public bool Verify()
         {
-            Transaction add = new Transaction(recipient, amount, tranType, message);
+            Transaction add = new Transaction(to, amount, tranType, message);
             NumOrder z = Crypto.Hash(add.ToString());
             var G = ECDSAParameters.basePoint;
             NumOrder rn = r;
@@ -141,6 +141,7 @@ namespace Blockchain
         }
 
     }
+
     public class Blockchain
     {
         public static List<string> chain = new List<string>();

@@ -26,14 +26,13 @@ namespace Blockchain
             NumFinite.modulo = ECDSAParameters.modulo;
             NumOrder.modulo = ECDSAParameters.order;
 
-
             var privKey = NumFinite.BigRandom(ECDSAParameters.order);
 
             Transaction t = new Transaction("abc", 10, TranType.one, "bca");
             Transaction t1 = t.Sign(privKey);
 
             Console.WriteLine(t1);
-            Console.WriteLine(t1.Verify(privKey));
+            Console.WriteLine(t1.Verify());
 
 
             Console.ReadKey();
