@@ -5,64 +5,64 @@ using System.Numerics;
 
 namespace Blockchain
 {
-    public class NumFinite: IComparable<NumFinite>
+    public class NumOrder: IComparable<NumOrder>
     {
         public BigInteger num;
         static public BigInteger modulo;
-        public NumFinite(BigInteger bigint)
+        public NumOrder(BigInteger bigint)
         {
             num = bigint;
         }
-        public NumFinite(string bigint)
+        public NumOrder(string bigint)
         {
             num = BigInteger.Parse("00" + bigint, System.Globalization.NumberStyles.AllowHexSpecifier);
         }
-        public NumFinite(NumOrder numo)
+        public NumOrder(NumFinite numf)
         {
-            num = numo.num;
+            num = numf.num;
         }
         public virtual BigInteger Modulo()
         {
             return modulo;
         }
-        public static explicit operator NumFinite(NumOrder numo)
+        public static explicit operator NumOrder(NumFinite numf)
         {
-            return new NumFinite(numo);
+            return new NumOrder(numf);
         }
-        public static implicit operator NumFinite(BigInteger bigint)
+        public static implicit operator NumOrder(BigInteger bigint)
         {
-            return new NumFinite(bigint);
+            return new NumOrder(bigint);
         }
-        public static implicit operator NumFinite(string bigint)
+        public static implicit operator NumOrder(string bigint)
         {
-            return new NumFinite(bigint);
+            return new NumOrder(bigint);
         }
-        public static implicit operator NumFinite(int integer)
+        public static implicit operator NumOrder(int integer)
         {
-            return new NumFinite(integer);
+            return new NumOrder(integer);
         }
-        public static NumFinite operator +(NumFinite n1, NumFinite n2)
+        public static NumOrder operator +(NumOrder n1, NumOrder n2)
         {
             return (n1.num + n2.num) % n1.Modulo();
         }
-        public static NumFinite operator -(NumFinite n1, NumFinite n2)
+        public static NumOrder operator -(NumOrder n1, NumOrder n2)
         {
             BigInteger a = (n1.num - n2.num) % n1.Modulo();
             return a < 0 ? n1.Modulo() + a : a;
         }
-        public static NumFinite operator *(NumFinite n1, NumFinite n2)
+        public static NumOrder operator *(NumOrder n1, NumOrder n2)
         {
             return (n1.num * n2.num) % n1.Modulo();
         }
-        public static NumFinite operator /(NumFinite n1, NumFinite n2)
+        public static NumOrder operator /(NumOrder n1, NumOrder n2)
         {
             return n1 * Inverse(n2);
         }
-        public static NumFinite operator %(NumFinite n1, NumFinite n2)
+        public static NumOrder operator %(NumOrder n1, NumOrder n2)
         {
             return (n1.num % n2.num) % n1.Modulo();
         }
-        private static NumFinite Inverse(NumFinite n)
+        private static NumOrder Inverse(NumOrder n)
         {
             var i = n.num;
             var j = n.Modulo();
@@ -89,15 +89,15 @@ namespace Blockchain
         {
             return ByteArrayToString(num.ToByteArray());
         }
-        public int CompareTo(NumFinite other)
+        public int CompareTo(NumOrder other)
         {
             return (num % Modulo()).CompareTo(other.num % Modulo());
         }
-        public static bool operator >(NumFinite n1, NumFinite n2)
+        public static bool operator >(NumOrder n1, NumOrder n2)
         {
             return (n1.num % n1.Modulo()) > (n2.num % n1.Modulo());
         }
-        public static bool operator <(NumFinite n1, NumFinite n2)
+        public static bool operator <(NumOrder n1, NumOrder n2)
         {
             return (n1.num % n1.Modulo()) < (n2.num % n1.Modulo());
         }
@@ -108,19 +108,6 @@ namespace Blockchain
             foreach (byte b in ba)
                 hex.AppendFormat("{0:x2}", b);
             return hex.ToString();
-        }
-        public static string BigRandom(NumFinite num)
-        {
-            Random random = new Random();
-            byte[] b = new byte[32];
-            BigInteger big;
-            do
-            {
-                random.NextBytes(b);
-                byte[] a = b.Reverse().Concat(new byte[] { 0 }).ToArray();
-                big = new BigInteger(a);
-            } while (big >= num.num || big.IsZero);
-            return ByteArrayToString(b);
         }
     }
 }

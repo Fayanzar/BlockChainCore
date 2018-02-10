@@ -20,14 +20,21 @@ namespace Blockchain
        
         static void Main(string[] args)
         {
-            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-            RSAParameters key = rsa.ExportParameters(true);
-            RSAKey pr = new RSAKey(key.Modulus, key.D);
-            RSAKey pu = new RSAKey(key.Modulus, key.Exponent);
+            ECDSAParameters.modulo = BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", System.Globalization.NumberStyles.AllowHexSpecifier);
+            ECDSAParameters.basePoint = new Point("79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8");
+            ECDSAParameters.order = BigInteger.Parse("0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", System.Globalization.NumberStyles.AllowHexSpecifier);
+            NumFinite.modulo = ECDSAParameters.modulo;
+            NumOrder.modulo = ECDSAParameters.order;
 
-            string text = "im retarded";
-            string sign = Crypto.SignData(text, pr);
-            Console.WriteLine(Crypto.VerifyData(sign, text, pu));
+
+            var privKey = NumFinite.BigRandom(ECDSAParameters.order);
+
+            Transaction t = new Transaction("abc", 10, TranType.one, "bca");
+            Transaction t1 = t.Sign(privKey);
+
+            Console.WriteLine(t1);
+            Console.WriteLine(t1.Verify(privKey));
+
 
             Console.ReadKey();
         }

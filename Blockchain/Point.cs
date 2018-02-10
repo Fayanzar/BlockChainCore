@@ -21,9 +21,9 @@ namespace Blockchain
         }
         public static Point operator +(Point p1, Point p2)
         {
-            if (p1.x.num == 0 && p1.y.num == 0)
+            if (p1.x.num.IsZero && p1.y.num.IsZero)
                 return p2;
-            if (p2.x.num == 0 && p2.y.num == 0)
+            if (p2.x.num.IsZero && p2.y.num.IsZero)
                 return p1;
             if (p1.x.num == p2.x.num)
             {
@@ -31,6 +31,7 @@ namespace Blockchain
                     return Double(p1);
                 else
                     return new Point(0, 0);
+
             }
             else
             {
@@ -84,5 +85,6 @@ namespace Blockchain
         {
             return "(" + x.ToString() + "; " + y.ToString() + ")";
         }
+
     }
 }

@@ -1,52 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
-using System.Numerics;
 
 namespace Blockchain
 {
-    public struct RSAKey
-    {
-        public BigInteger modulus;
-        public BigInteger exponent;
-        public RSAKey(BigInteger n, BigInteger e)
-        {
-            modulus = n;
-            exponent = e;
-        }
-        public RSAKey(byte[] n, byte[] e)
-        {
-            modulus = new BigInteger(Crypto.Correct(n.Reverse().ToArray()));
-            exponent = new BigInteger(Crypto.Correct(e.Reverse().ToArray()));
-        }
-    }
-
     static public class Crypto
     {
-        public static byte[] Correct(byte[] bytes)
-        {
-            if ((bytes[bytes.Length - 1] & 0x80) > 0)
-            {
-                byte[] temp = new byte[bytes.Length];
-                Array.Copy(bytes, temp, bytes.Length);
-                bytes = new byte[temp.Length + 1];
-                Array.Copy(temp, bytes, temp.Length);
-            }
-            return bytes;
-        }
-
-      /*  public static RSAKey[] GenerateKey(int length)
-        {
-            Random random = new Random();
-            byte[] pBytes = new byte[length], qBytes = new byte[length];
-            random.NextBytes(pBytes);
-            random.NextBytes(qBytes);
-            BigInteger
-        }*/
-
         public static string ToStrHex(byte[] bytes, bool upperCase)
         {
             StringBuilder result = new StringBuilder(bytes.Length * 2);
@@ -86,32 +45,5 @@ namespace Blockchain
             return ToStrHex(br, false);
         }
 
-        public static string SignData(string data, RSAKey key)
-        {
-            BigInteger d = key.exponent;
-            BigInteger n = key.modulus;
-            SHA1CryptoServiceProvider sha = new SHA1CryptoServiceProvider();
-            Encoding asc = Encoding.ASCII;
-            byte[] textBytes = asc.GetBytes(data);
-            byte[] hash = sha.ComputeHash(textBytes);
-            BigInteger m = new BigInteger(Correct(hash.Reverse().ToArray()));
-            BigInteger s = BigInteger.ModPow(m, d, n);
-            byte[] signed = s.ToByteArray().Reverse().ToArray();
-            return ToStrHex(signed, false);
-        }
-
-        public static bool VerifyData(string verData, string sigData, RSAKey key)
-        {
-            BigInteger e = key.exponent;
-            BigInteger n = key.modulus;
-            SHA1CryptoServiceProvider sha = new SHA1CryptoServiceProvider();
-            Encoding asc = Encoding.ASCII;
-            byte[] textBytes = asc.GetBytes(sigData);
-            byte[] hash = sha.ComputeHash(textBytes);
-            byte[] signed = HexToByteArray(verData);
-            BigInteger s = new BigInteger(Correct(signed.Reverse().ToArray()));
-            BigInteger m = BigInteger.ModPow(s, e, n);
-            return (m == new BigInteger(Correct(hash.Reverse().ToArray())));
-        }
     }
 }
