@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Script.Serialization;
+using System.IO;
 
 namespace Blockchain
 {
-    public enum TranType { one, two, three }
+    [Flags] public enum TranType { Give, Withdraw, PayRoot, GenerateToken, NewUser, NewObject, CreateRels, System }
     public struct Transaction
     {
         public string to;
@@ -93,7 +94,7 @@ namespace Blockchain
             {
                 List<string> level = new List<string>();
                 int n = transactions.Count / 2;
-                for (int i = 0; i < n - 1; i++)
+                for (int i = 0; i < n; i++)
                 {
                     level.Add(Crypto.Hash(Crypto.ToStrASCII(transactions[0]) + Crypto.ToStrASCII(transactions[1])));
                     transactions.RemoveRange(0, 2);
@@ -111,15 +112,13 @@ namespace Blockchain
     
     public struct Block
     {
-        public int index;
         public string timestamp;
         public string merkleRoot;
         public string ownHash;
         public string prevHash;
         public List<Transaction> transactions;
-        public Block(int i, string t, List<Transaction> tr, string pr)
+        public Block(string t, List<Transaction> tr, string pr)
         {
-            index = i;
             timestamp = t;
             merkleRoot = Transaction.Merkle(tr);
             prevHash = pr;
@@ -129,10 +128,7 @@ namespace Blockchain
         public void ComputeHash()
         {
             ownHash = "";
-            List<Transaction> trAdd = transactions.Select(x => x).ToList();
-            transactions = new List<Transaction>();
             ownHash = Crypto.Hash(ToString());
-            transactions = trAdd;
         }
         public override string ToString()
         {
@@ -144,26 +140,60 @@ namespace Blockchain
 
     public class Blockchain
     {
-        public static List<string> chain = new List<string>();
         List<Transaction> transactions;
-        public Blockchain()
+        bool mining = false;
+        string filename;
+        public bool Mining { get { return mining; } }
+        public Blockchain(string f)
         {
+            filename = f;
             transactions = new List<Transaction>();
+            if (!File.Exists(filename))
+                File.Create(filename);
         }
 
-        public void AddTransaction(string re, decimal a, TranType t, string m, string v, string r, string s)
+        public void AddTransaction(Transaction transaction)
         {
-            transactions.Add(new Transaction(re, a, t, m));        
+            transactions.Add(transaction);        
         }
 
-        public void MineBlock()
+        public void MineBlock(Object stateInfo)
         {
             //have to send a message to the sender and recipient for the transaction has passed succesfully
-            string prevHash = chain.Count > 0 ? chain.ElementAt(chain.Count - 2) : "0";
-            string timestamp = DateTime.Now.ToString();
-            Block block = new Block(chain.Count, timestamp, transactions, prevHash);
-            block.ComputeHash();
-            chain.Add(block.ToString());
+            if (transactions.Count > 0)
+            {
+                mining = true;
+                var serializer = new JavaScriptSerializer();
+                string prevHash = "0";
+                using (StreamReader sr = File.OpenText(filename))
+                {
+                    string line;
+                    DateTime maxTimestamp = DateTime.MinValue;
+                    while(!sr.EndOfStream)
+                    {
+                        line = sr.ReadLine();
+                        var blockLine = serializer.Deserialize<Block>(line);
+                        var blockTimestamp = DateTime.Parse(blockLine.timestamp);                        
+                        if (blockTimestamp > maxTimestamp)
+                        {
+                            maxTimestamp = blockTimestamp;
+                            prevHash = blockLine.ownHash;
+                        }
+                    }
+                }
+
+                string timestamp = DateTime.Now.ToString();
+
+                Block block = new Block(timestamp, transactions, prevHash);
+
+                block.ComputeHash();
+                using (StreamWriter sw = File.AppendText(filename))
+                {
+                    sw.WriteLine(block);
+                }
+                transactions.Clear();
+                mining = false;
+            }
         }
     }
 }
